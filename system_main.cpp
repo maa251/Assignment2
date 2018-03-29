@@ -1,0 +1,38 @@
+#include <iostream>
+#include <string>
+#include <functional>
+#include <vector>
+#include <map>
+
+#include "State.h"
+#include "Condition.h"
+#include "Action.h"
+#include "FSM2.h"
+#include "Port.h"
+#include "Interaction.h"
+#include "System.h"
+
+using namespace std;
+
+int main()
+{
+	State state1("State 1");
+	State state2("State 2");
+	map<string, State> states;
+	states.insert(pair<string, State>(state1.getName(), state1));
+	states.insert(pair<string, State>(state2.getName(), state2));
+
+	Condition check(function<bool()>([] { return true; }));
+	Action print(function<void()>([] {cout << "ACTION!\n"; }));
+	FSM fsm(states, state1);
+	Port port(fsm); 
+	Transition t1(state1, state2, fsm, port, check, print);
+	vector<Port*> ports;
+	ports.push_back(&port);
+      	Interaction interaction(ports, print, check);
+	vector<Interaction> interactions;
+	interactions.push_back(interaction);
+	System system(interactions);
+	system.run();
+	return 0;
+}
